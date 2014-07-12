@@ -14,12 +14,13 @@ import org.slf4j.LoggerFactory;
 
 import br.com.uget.handlers.EventConvertHandler;
 import br.com.uget.listeners.AsyncConvertListener;
-import br.com.uget.utils.ConversorUtils;
 
 public class Converter implements EventConvertHandler{
+	
 	private Logger log = LoggerFactory.getLogger(Converter.class);
 	private ConcurrentLinkedQueue<AsyncConvertListener> listeners = new ConcurrentLinkedQueue<>();
-	
+
+	private ConverterConfig convConfig;
 	private File videoFile;
 	private File musicFile;
 	
@@ -27,13 +28,24 @@ public class Converter implements EventConvertHandler{
 	private Pattern patternProgressTime = Pattern.compile("time=([^,.]*)");
 	
 	/**
-	 * Construtor padr�o
+	 * Default constructor
 	 */
-	public Converter() {}
+	public Converter() {
+		this(new ConverterConfig());
+	}
+	
+	public Converter(ConverterConfig convConfig) {
+		setConverterConfig(convConfig);
+	}
 	
 	public Converter(File videoFile){
 		this();
 		this.videoFile = videoFile;
+	}
+	
+	public Converter(File videoFile, ConverterConfig convConfig){
+		this(videoFile);
+		setConverterConfig(convConfig);
 	}
 	
 	public void convert(){
@@ -65,7 +77,7 @@ public class Converter implements EventConvertHandler{
 	 * @throws InterruptedException
 	 */
 	private boolean convertMP3(File videoFile, File musicFile) throws IOException, InterruptedException{
-		ProcessBuilder builder = new ProcessBuilder(ConversorUtils.BASE_PATH, "-i", videoFile.getAbsolutePath(), musicFile.getAbsolutePath());
+		ProcessBuilder builder = new ProcessBuilder(convConfig.getPathConverter(), "-i", videoFile.getAbsolutePath(), musicFile.getAbsolutePath());
 		builder.redirectErrorStream(true);
 		final Process processo = builder.start();
 		
@@ -160,4 +172,11 @@ public class Converter implements EventConvertHandler{
 		this.musicFile = musicFile;
 	}
 
+	public ConverterConfig getConverterConfig() {
+		return convConfig;
+	}
+
+	public void setConverterConfig(ConverterConfig convConfig) {
+		this.convConfig = convConfig;
+	}
 }
