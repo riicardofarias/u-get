@@ -2,7 +2,7 @@ package br.com.uget.tasks;
 
 
 public class ConverterConfig {
-	private static String DEFAULT_HOME_CONV = "C:\\ffmpeg\\bin\\";
+	private static String DEFAULT_HOME_CONV = "C:\\ffmpeg\\bin\\ffmpeg.exe";
 	
 	private String pathConv;
 	

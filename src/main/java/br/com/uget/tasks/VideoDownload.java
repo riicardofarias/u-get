@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import br.com.uget.handlers.EventDownloadHandler;
+import br.com.uget.info.DownloadInfo;
 import br.com.uget.info.VideoInfo;
 import br.com.uget.listeners.AsyncDownloadListener;
 import br.com.uget.utils.YouGetUtils;
@@ -86,10 +87,10 @@ public class VideoDownload implements Runnable, EventDownloadHandler{
 
 			input = connection.getInputStream();
 
-			String fileName = YouGetUtils.sanitizeNome(vInfo.getTitle());
+			String fileName = YouGetUtils.sanitizeNome(vInfo.getVideoId());
 			fileName += ".mp4";
-
-			videoFile = new File(local + File.separator + fileName);      											 // Arquivo MP4 
+			
+			videoFile = new File(local + File.separator +  fileName);      											 // Arquivo MP4 
 
 			removeIfExists(videoFile); //Remove o v�deo se existir
 
@@ -117,7 +118,7 @@ public class VideoDownload implements Runnable, EventDownloadHandler{
 
 			// download complete
 			if(getStatus() == DOWNLOADING){
-				complete(videoFile);
+				complete(new DownloadInfo(vInfo, videoFile));
 			}
 		}
 	}
@@ -139,9 +140,9 @@ public class VideoDownload implements Runnable, EventDownloadHandler{
 	}
 
 	//Download completo
-	private void complete(File file){
+	private void complete(DownloadInfo downloadInfo){
 		setEstado(COMPLETE);
-		fireDownloadComplete(file);
+		fireDownloadComplete(downloadInfo);
 	}
 
 	//Baixando arquivo
@@ -169,9 +170,9 @@ public class VideoDownload implements Runnable, EventDownloadHandler{
 	}
 
 	@Override
-	public void fireDownloadComplete(File file) {
+	public void fireDownloadComplete(DownloadInfo downloadInfo) {
 		for (AsyncDownloadListener event : listeners) {
-			event.onComplete(file);
+			event.onComplete(downloadInfo);
 		}
 	}
 

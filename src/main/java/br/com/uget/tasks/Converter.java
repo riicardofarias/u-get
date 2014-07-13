@@ -13,47 +13,43 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import br.com.uget.handlers.EventConvertHandler;
+import br.com.uget.info.DownloadInfo;
 import br.com.uget.listeners.AsyncConvertListener;
 
 public class Converter implements EventConvertHandler{
-	
 	private Logger log = LoggerFactory.getLogger(Converter.class);
 	private ConcurrentLinkedQueue<AsyncConvertListener> listeners = new ConcurrentLinkedQueue<>();
-
+	
 	private ConverterConfig convConfig;
-	private File videoFile;
+	private DownloadInfo downloadInfo;
+
 	private File musicFile;
 	
 	private Pattern patternTotalSeconds = Pattern.compile("Duration: ([^,.]*)");
 	private Pattern patternProgressTime = Pattern.compile("time=([^,.]*)");
 	
-	/**
-	 * Default constructor
-	 */
-	public Converter() {
-		this(new ConverterConfig());
+	public Converter(DownloadInfo downloadInfo) {
+		setDownloadInfo(downloadInfo);
+		setConverterConfig(new ConverterConfig());
 	}
 	
-	public Converter(ConverterConfig convConfig) {
-		setConverterConfig(convConfig);
-	}
-	
-	public Converter(File videoFile){
-		this();
-		this.videoFile = videoFile;
-	}
-	
-	public Converter(File videoFile, ConverterConfig convConfig){
-		this(videoFile);
+	public Converter(DownloadInfo downloadInfo, ConverterConfig convConfig) {
+		this(downloadInfo);
 		setConverterConfig(convConfig);
 	}
 	
 	public void convert(){
-		if(musicFile == null)
-			musicFile = new File(videoFile.getPath().replace("mp4", "mp3")); // replace extension
+		File videoFile = downloadInfo.getVideoFile();
 		
-		if(musicFile.exists())
-			musicFile = rename(musicFile);                                   // rename file if exists
+		if(musicFile == null){
+			String fileName = downloadInfo.getInfo().getTitle().concat(".mp3");
+			musicFile = new File(videoFile.getParent() + File.separator + fileName); // replace extension
+		}
+		if(musicFile.exists()){
+			fireOnConverted(musicFile);
+			return;
+		}
+		
 		try {
 			if(convertMP3(videoFile, musicFile))                             // init convertion
 				fireOnConverted(musicFile);                                  // convertion complete
@@ -103,22 +99,6 @@ public class Converter implements EventConvertHandler{
 		return (processo.waitFor() == 0) ? true : false;
 	}
 	
-	private File rename(File music){
-		String name = music.getPath().substring(0, music.getPath().length() - 4);
-		String extension = music.getName().substring(music.getName().length() - 4);
-		int count = 1;
-		
-		for (String m : music.getParentFile().list()) {
-			if(music.getName().equals(m)){
-				System.out.println(name);
-				count++;
-			}
-		}
-		
-		String newFile = String.format("%s (%d)%s", name, count, extension);
-		return new File(newFile);
-	}
-	
 	private float getSeconds(String time){
 		String[] times = time.split(":");
 		float totalSeconds = (Integer.parseInt(times[0]) * 3600) 
@@ -155,13 +135,12 @@ public class Converter implements EventConvertHandler{
 		}
 	}
 	
-	// Getters and Setters
-	public File getvideoFile() {
-		return videoFile;
+	public DownloadInfo getDownloadInfo() {
+		return downloadInfo;
 	}
 
-	public void setvideoFile(File videoFile) {
-		this.videoFile = videoFile;
+	public void setDownloadInfo(DownloadInfo downloadInfo) {
+		this.downloadInfo = downloadInfo;
 	}
 
 	public File getMusicFile() {

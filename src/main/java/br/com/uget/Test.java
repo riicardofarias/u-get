@@ -16,6 +16,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import br.com.uget.info.DownloadInfo;
 import br.com.uget.info.VideoInfo;
 import br.com.uget.listeners.AsyncConvertListener;
 import br.com.uget.listeners.AsyncDownloadListener;
@@ -24,7 +25,7 @@ import br.com.uget.tasks.Converter;
 import br.com.uget.utils.YouGetUtils;
 
 
-public class YouGetTest {
+public class Test {
 	private static String source;
 	public static void main(String[] args) throws MalformedURLException {
 		String playlist = args[0];
@@ -70,9 +71,9 @@ public class YouGetTest {
 		}
 
 		@Override
-		public void onComplete(File file) {
-			System.out.println("Baixou: " + file);
-			Converter c = new Converter(file);
+		public void onComplete(DownloadInfo downloadInfo) {
+			System.out.println("Baixou: " + downloadInfo.getVideoFile());
+			Converter c = new Converter(downloadInfo);
 			c.addConvertListener(new ConvertListener());
 			//c.convert();
 		}

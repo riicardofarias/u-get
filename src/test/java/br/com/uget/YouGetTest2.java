@@ -16,6 +16,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import br.com.uget.info.DownloadInfo;
 import br.com.uget.info.VideoInfo;
 import br.com.uget.listeners.AsyncConvertListener;
 import br.com.uget.listeners.AsyncDownloadListener;
@@ -27,16 +28,18 @@ import br.com.uget.utils.YouGetUtils;
 public class YouGetTest2 {
 	private static String source;
 	public static void main(String[] args) throws MalformedURLException {
-		String playlist = args[0];
-		String path = args[1];
+		/*
+		List<String> videos = getPlaylist("https://www.youtube.com/playlist?list=PLu3m-CUa7JQyjVA791h9L-totDbYKENQM");
 		
-		List<String> videos = getPlaylist(playlist);
-		
-		YouGet yGet = new YouGet(new File(path + source));
+		YouGet yGet = new YouGet(new File("D:\\YouGetMusic\\" + source));
 		
 		for (String url : videos) {
 			yGet.addURL(url);
 		}
+		*/
+		
+		YouGet yGet = new YouGet(new File("D:\\"));
+		yGet.addURL("https://www.youtube.com/watch?v=bK74s9B3aBc");
 		
 		yGet.addExtractListener(new ExtractListener());
 		yGet.addDownloadListener(new DownloadListener());
@@ -70,11 +73,11 @@ public class YouGetTest2 {
 		}
 
 		@Override
-		public void onComplete(File file) {
-			System.out.println("Baixou: " + file);
-			//Converter c = new Converter(file);
-			//c.addConvertListener(new ConvertListener());
-			//c.convert();
+		public void onComplete(DownloadInfo downloadInfo) {
+			System.out.println("Baixou: " + downloadInfo.getVideoFile());
+			Converter c = new Converter(downloadInfo);
+			c.addConvertListener(new ConvertListener());
+			c.convert();
 		}
 
 		@Override
