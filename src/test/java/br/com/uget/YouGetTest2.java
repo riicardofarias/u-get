@@ -22,6 +22,7 @@ import br.com.uget.listeners.AsyncConvertListener;
 import br.com.uget.listeners.AsyncDownloadListener;
 import br.com.uget.listeners.AsyncExtractListener;
 import br.com.uget.tasks.Converter;
+import br.com.uget.tasks.ConverterConfig;
 import br.com.uget.utils.YouGetUtils;
 
 
@@ -38,12 +39,12 @@ public class YouGetTest2 {
 		}
 		*/
 		
-		YouGet yGet = new YouGet(new File("D:\\"));
-		yGet.addURL("https://www.youtube.com/watch?v=bK74s9B3aBc");
+		YouGet yGet = new YouGet(new File("/home/ricardo/Música/"));
+		yGet.addURL("https://www.youtube.com/watch?v=zwqrmEMB0wc&index=4&list=PLu3m-CUa7JQyjVA791h9L-totDbYKENQM");
 		
 		yGet.addExtractListener(new ExtractListener());
 		yGet.addDownloadListener(new DownloadListener());
-		
+
 		yGet.download();
 	}
 	
@@ -75,7 +76,9 @@ public class YouGetTest2 {
 		@Override
 		public void onComplete(DownloadInfo downloadInfo) {
 			System.out.println("Baixou: " + downloadInfo.getVideoFile());
-			Converter c = new Converter(downloadInfo);
+			
+			ConverterConfig config = new ConverterConfig("avconv");
+			Converter c = new Converter(downloadInfo, config);
 			c.addConvertListener(new ConvertListener());
 			c.convert();
 		}

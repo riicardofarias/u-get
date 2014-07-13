@@ -10,8 +10,6 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 
 public class YouGetUtils {
-	public static final String FFMPEG_CONFIG = "ffmpeg";
-	//public static final String FFMPEG_CONFIG = "C:\\ffmpeg\\bin\\ffmpeg.exe";
 	public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36";
 	public static final String ENCODING = "UTF-8";
 	public static final int    STATUS_OK = 200; // Requisi��o correta

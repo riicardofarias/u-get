@@ -26,7 +26,7 @@ public class Converter implements EventConvertHandler{
 	private File musicFile;
 	
 	private Pattern patternTotalSeconds = Pattern.compile("Duration: ([^,.]*)");
-	private Pattern patternProgressTime = Pattern.compile("time=([^,.]*)");
+	private Pattern patternProgressTime = Pattern.compile("(?<=time=)[\\d.]*");
 	
 	public Converter(DownloadInfo downloadInfo) {
 		setDownloadInfo(downloadInfo);
@@ -73,7 +73,7 @@ public class Converter implements EventConvertHandler{
 	 * @throws InterruptedException
 	 */
 	private boolean convertMP3(File videoFile, File musicFile) throws IOException, InterruptedException{
-		ProcessBuilder builder = new ProcessBuilder(convConfig.getPathConverter(), "-i", videoFile.getAbsolutePath(), musicFile.getAbsolutePath());
+		ProcessBuilder builder = new ProcessBuilder(convConfig.getPathConverter(), "-i", videoFile.getAbsolutePath(), "-threads", "auto","-vn","-b:a", "128k","-map","a", musicFile.getAbsolutePath());
 		builder.redirectErrorStream(true);
 		final Process processo = builder.start();
 		
@@ -91,8 +91,8 @@ public class Converter implements EventConvertHandler{
 	    	
 	    	Matcher mProgress = patternProgressTime.matcher(line);
 	    	if(mProgress.find()){
-	    		float progress = (getSeconds(mProgress.group(1)) / totalSeconds) * 100; // progress
-	    		fireOnConverting(videoFile, progress); 									// converting file
+	    		double progress = (Double.parseDouble(mProgress.group()) / totalSeconds) * 100; // progress
+	    		fireOnConverting(videoFile, (float) progress); 									// converting file
 	    	}
 	    }
 	    
